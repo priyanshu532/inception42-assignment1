@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: qwen-model-download
+  namespace: inception-dev
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: downloader
+          image: curlimages/curl:8.12.1
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              curl -fL --retry 3 \
+                -o /models/qwen.gguf.tmp \
+                https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+              mv /models/qwen.gguf.tmp /models/qwen.gguf
+              ls -lh /models/qwen.gguf
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: model-storage
+              mountPath: /models
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: qwen-model-pvc

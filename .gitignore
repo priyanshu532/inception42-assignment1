@@ -1,0 +1,15 @@
+
+k8s/ingress/certs/
+
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!.env.example
+.terraform/
+*.tfstate
+*.tfstate.*
+generated/
+security/reports/

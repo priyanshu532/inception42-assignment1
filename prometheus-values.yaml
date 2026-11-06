@@ -1,0 +1,31 @@
+alertmanager:
+  enabled: false
+
+pushgateway:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+server:
+  replicaCount: 1
+  persistentVolume:
+    enabled: false
+  retention: "6h"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+prometheus-pushgateway:
+  enabled: false
+
+configmapReload:
+  prometheus:
+    enabled: false

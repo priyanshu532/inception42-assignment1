@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: gateway-ip-allowlist
+  namespace: inception-dev
+spec:
+  ipAllowList:
+    sourceRange:
+      - 172.18.0.1/32

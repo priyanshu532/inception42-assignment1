@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assistant
+  namespace: inception-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: assistant
+  template:
+    metadata:
+      labels:
+        app: assistant
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: assistant
+          image: inception-assistant:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 192Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: assistant
+  namespace: inception-dev
+spec:
+  selector:
+    app: assistant
+  ports:
+    - port: 80
+      targetPort: 8000

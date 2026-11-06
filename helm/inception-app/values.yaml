@@ -1,0 +1,25 @@
+services:
+  catalog:
+    image: inception-catalog:v1
+    port: 8000
+    servicePort: 80
+    memory: 192Mi
+  gateway:
+    image: inception-gateway:v2
+    port: 8000
+    servicePort: 80
+    memory: 192Mi
+  assistant:
+    image: inception-assistant:v2
+    port: 8000
+    servicePort: 80
+    memory: 192Mi
+
+llm:
+  image: ghcr.io/ggml-org/llama.cpp:server
+  modelPath: /models/qwen.gguf
+  pvcName: qwen-model-pvc
+  memory: 1Gi
+  cpu: "2"
+  contextSize: 512
+  threads: 2

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  namespace: inception-dev
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: llm
+  template:
+    metadata:
+      labels:
+        app: llm
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: llm
+          image: ghcr.io/ggml-org/llama.cpp:server
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-m"
+            - "/models/qwen.gguf"
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "8000"
+            - "-c"
+            - "512"
+            - "-t"
+            - "2"
+            - "-np"
+            - "1"
+            - "-ngl"
+            - "0"
+          ports:
+            - containerPort: 8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          volumeMounts:
+            - name: model-storage
+              mountPath: /models
+              readOnly: true
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: qwen-model-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm
+  namespace: inception-dev
+spec:
+  selector:
+    app: llm
+  ports:
+    - port: 8000
+      targetPort: 8000

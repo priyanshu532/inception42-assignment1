@@ -1,0 +1,535 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"assistant","namespace":"inception-dev"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"assistant"}},"template":{"metadata":{"labels":{"app":"assistant"}},"spec":{"containers":[{"image":"inception-assistant:v1","imagePullPolicy":"Never","name":"assistant","ports":[{"containerPort":8000}],"readinessProbe":{"httpGet":{"path":"/health","port":8000},"periodSeconds":5},"resources":{"limits":{"cpu":"250m","memory":"192Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}}],"securityContext":{"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+    creationTimestamp: "2026-11-06T07:40:33Z"
+    generation: 2
+    name: assistant
+    namespace: inception-dev
+    resourceVersion: "5076"
+    uid: 3de42bc1-094d-4891-8157-5e0cf8be38ae
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: assistant
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: assistant
+      spec:
+        containers:
+        - image: inception-assistant:v2
+          imagePullPolicy: Never
+          name: assistant
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 250m
+              memory: 192Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-11-06T07:40:42Z"
+      lastUpdateTime: "2026-11-06T07:40:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-11-06T07:40:34Z"
+      lastUpdateTime: "2026-11-06T08:03:07Z"
+      message: ReplicaSet "assistant-f9b99bf45" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"catalog","namespace":"inception-dev"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"catalog"}},"template":{"metadata":{"labels":{"app":"catalog"}},"spec":{"containers":[{"image":"inception-catalog:v1","imagePullPolicy":"Never","livenessProbe":{"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":10,"periodSeconds":10},"name":"catalog","ports":[{"containerPort":8000}],"readinessProbe":{"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":3,"periodSeconds":5},"resources":{"limits":{"cpu":"250m","memory":"192Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}}],"securityContext":{"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+    creationTimestamp: "2026-11-06T07:30:57Z"
+    generation: 1
+    name: catalog
+    namespace: inception-dev
+    resourceVersion: "2385"
+    uid: 34e56a20-7940-45aa-95af-72b79de84dad
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: catalog
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: catalog
+      spec:
+        containers:
+        - image: inception-catalog:v1
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: catalog
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 250m
+              memory: 192Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-11-06T07:31:03Z"
+      lastUpdateTime: "2026-11-06T07:31:03Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-11-06T07:30:57Z"
+      lastUpdateTime: "2026-11-06T07:31:03Z"
+      message: ReplicaSet "catalog-6569cf499d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"gateway","namespace":"inception-dev"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"gateway"}},"template":{"metadata":{"labels":{"app":"gateway"}},"spec":{"containers":[{"image":"inception-gateway:v1","imagePullPolicy":"Never","livenessProbe":{"httpGet":{"path":"/health","port":8000},"periodSeconds":10},"name":"gateway","ports":[{"containerPort":8000}],"readinessProbe":{"httpGet":{"path":"/health","port":8000},"periodSeconds":5},"resources":{"limits":{"cpu":"250m","memory":"192Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}}],"securityContext":{"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}}}}}}
+    creationTimestamp: "2026-11-06T07:38:15Z"
+    generation: 2
+    name: gateway
+    namespace: inception-dev
+    resourceVersion: "5375"
+    uid: 434c0c46-dd10-4d0c-9373-d1025fe9e229
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: gateway
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: gateway
+      spec:
+        containers:
+        - image: inception-gateway:v2
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gateway
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 250m
+              memory: 192Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-11-06T07:38:23Z"
+      lastUpdateTime: "2026-11-06T07:38:23Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-11-06T07:38:16Z"
+      lastUpdateTime: "2026-11-06T08:05:16Z"
+      message: ReplicaSet "gateway-77489bf696" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"llm","namespace":"inception-dev"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"llm"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"llm"}},"spec":{"containers":[{"args":["-m","/models/qwen.gguf","--host","0.0.0.0","--port","8000","-c","512","-t","2","-np","1","-ngl","0"],"image":"ghcr.io/ggml-org/llama.cpp:server","imagePullPolicy":"IfNotPresent","name":"llm","ports":[{"containerPort":8000}],"readinessProbe":{"httpGet":{"path":"/health","port":8000},"periodSeconds":10},"resources":{"limits":{"cpu":"2","memory":"1Gi"},"requests":{"cpu":"250m","memory":"512Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"startupProbe":{"failureThreshold":30,"httpGet":{"path":"/health","port":8000},"periodSeconds":10},"volumeMounts":[{"mountPath":"/models","name":"model-storage","readOnly":true}]}],"securityContext":{"fsGroup":10001,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}},"volumes":[{"name":"model-storage","persistentVolumeClaim":{"claimName":"qwen-model-pvc"}}]}}}}
+    creationTimestamp: "2026-11-06T07:57:47Z"
+    generation: 1
+    name: llm
+    namespace: inception-dev
+    resourceVersion: "4512"
+    uid: dd53ded4-dc43-4fcb-8193-d65809ca806c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: llm
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: llm
+      spec:
+        containers:
+        - args:
+          - -m
+          - /models/qwen.gguf
+          - --host
+          - 0.0.0.0
+          - --port
+          - "8000"
+          - -c
+          - "512"
+          - -t
+          - "2"
+          - -np
+          - "1"
+          - -ngl
+          - "0"
+          image: ghcr.io/ggml-org/llama.cpp:server
+          imagePullPolicy: IfNotPresent
+          name: llm
+          ports:
+          - containerPort: 8000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "2"
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /models
+            name: model-storage
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: qwen-model-pvc
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-11-06T07:58:37Z"
+      lastUpdateTime: "2026-11-06T07:58:37Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-11-06T07:57:47Z"
+      lastUpdateTime: "2026-11-06T07:58:37Z"
+      message: ReplicaSet "llm-6f67c5874f" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"assistant","namespace":"inception-dev"},"spec":{"ports":[{"port":80,"targetPort":8000}],"selector":{"app":"assistant"}}}
+    creationTimestamp: "2026-11-06T07:40:34Z"
+    name: assistant
+    namespace: inception-dev
+    resourceVersion: "3508"
+    uid: 0dd671a3-3630-4297-83f3-ba9223978f44
+  spec:
+    clusterIP: 10.96.177.5
+    clusterIPs:
+    - 10.96.177.5
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: assistant
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"catalog","namespace":"inception-dev"},"spec":{"ports":[{"port":80,"targetPort":8000}],"selector":{"app":"catalog"}}}
+    creationTimestamp: "2026-11-06T07:30:57Z"
+    name: catalog
+    namespace: inception-dev
+    resourceVersion: "2346"
+    uid: 133a310a-925d-4f16-bcda-1b7999f49f90
+  spec:
+    clusterIP: 10.96.98.177
+    clusterIPs:
+    - 10.96.98.177
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: catalog
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"gateway","namespace":"inception-dev"},"spec":{"ports":[{"port":80,"targetPort":8000}],"selector":{"app":"gateway"}}}
+    creationTimestamp: "2026-11-06T07:38:16Z"
+    name: gateway
+    namespace: inception-dev
+    resourceVersion: "3212"
+    uid: 75fc5522-55f2-4c6b-b91f-2c082f458e93
+  spec:
+    clusterIP: 10.96.32.139
+    clusterIPs:
+    - 10.96.32.139
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: gateway
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"llm","namespace":"inception-dev"},"spec":{"ports":[{"port":8000,"targetPort":8000}],"selector":{"app":"llm"}}}
+    creationTimestamp: "2026-11-06T07:57:47Z"
+    name: llm
+    namespace: inception-dev
+    resourceVersion: "4388"
+    uid: b9b6ba87-2c3d-4b70-95a1-c07aa7cb0c48
+  spec:
+    clusterIP: 10.96.130.224
+    clusterIPs:
+    - 10.96.130.224
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: llm
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

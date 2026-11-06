@@ -1,0 +1,65 @@
+name: DevSecOps Security Pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application images
+        run: |
+          docker build -t inception-gateway:ci ./apps/gateway
+          docker build -t inception-catalog:ci ./apps/catalog
+          docker build -t inception-assistant:ci ./apps/assistant
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget -qO trivy.deb https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.deb
+          sudo dpkg -i trivy.deb
+
+      - name: Scan images and generate SBOMs
+        run: |
+          mkdir -p security/reports
+          for svc in gateway catalog assistant; do
+            trivy image --image-src docker \
+              --scanners vuln \
+              --severity HIGH,CRITICAL \
+              --format json \
+              --output security/reports/$svc-vulnerabilities.json \
+              inception-$svc:ci
+
+            trivy image --image-src docker \
+              --format cyclonedx \
+              --output security/reports/$svc-sbom.json \
+              inception-$svc:ci
+          done
+
+      - name: Scan Kubernetes configuration
+        run: |
+          trivy config --severity HIGH,CRITICAL \
+            --format json \
+            --output security/reports/k8s-config.json \
+            k8s/
+
+          trivy config --severity HIGH,CRITICAL \
+            --format json \
+            --output security/reports/helm-config.json \
+            helm/inception-app
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: security/reports/

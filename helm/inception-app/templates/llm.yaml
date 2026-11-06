@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: llm
+  template:
+    metadata:
+      labels:
+        app: llm
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: llm
+          image: {{ .Values.llm.image }}
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-m"
+            - {{ .Values.llm.modelPath | quote }}
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "8000"
+            - "-c"
+            - {{ .Values.llm.contextSize | quote }}
+            - "-t"
+            - {{ .Values.llm.threads | quote }}
+            - "-np"
+            - "1"
+            - "-ngl"
+            - "0"
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: {{ .Values.llm.cpu | quote }}
+              memory: {{ .Values.llm.memory }}
+          volumeMounts:
+            - name: model-storage
+              mountPath: /models
+              readOnly: true
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.llm.pvcName }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm
+spec:
+  selector:
+    app: llm
+  ports:
+    - port: 8000
+      targetPort: 8000

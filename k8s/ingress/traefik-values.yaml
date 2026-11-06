@@ -1,0 +1,47 @@
+deployment:
+  replicas: 1
+
+service:
+  enabled: false
+
+hostNetwork: true
+
+
+ports:
+  web:
+    port: 80
+    exposedPort: 80
+  websecure:
+    port: 443
+    exposedPort: 443
+
+nodeSelector:
+  kubernetes.io/hostname: inception-tf-control-plane
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+
+additionalArguments:
+  - "--accesslog=true"
+  - "--accesslog.format=json"
+
+updateStrategy:
+  type: Recreate
